@@ -4,7 +4,7 @@
   "description": "Freebie Dashboard for Bootstrap 5",
   "main": "pages/dashboard.html",
   "directories": {
-    "example": "root"
+    "doc": "docs"
   },
   "scripts": {
     "open-app": "gulp open-app",
