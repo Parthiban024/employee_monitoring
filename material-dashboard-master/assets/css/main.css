@@ -16,3 +16,16 @@
 .snackbar.show {
     display: block;
 }
+
+.file_upload{
+    display: none;
+}
+.upload_label{
+    background-color: #3498db;
+    color: #fff;
+    padding: 7px 10px;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
