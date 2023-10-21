@@ -10686,6 +10686,9 @@ fieldset:disabled .btn {
 .text-white {
   color: #fff !important;
 }
+.text-black {
+  color: #000 !important;
+}
 
 .text-dark-blue {
   color: #1A237E !important;
@@ -23340,6 +23343,7 @@ hr.horizontal.gray-light {
   position: absolute;
   background-size: cover;
   background-position: center center;
+  background-color: #fffef9;
   top: 0;
   left: 0;
   width: 100%;
