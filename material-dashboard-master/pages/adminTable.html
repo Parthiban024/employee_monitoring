@@ -658,11 +658,14 @@
       });
     });
   </script>
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
   const fileInput = document.getElementById('fileInput');
   const uploadButton = document.getElementById('uploadButton');
   const authorTable = document.getElementById('authorTable');
+
+  // Define a Set to keep track of unique EmpId and Name pairs
+  const uniqueData = new Set();
 
   const fetchDataAndPopulateTable = async () => {
     try {
@@ -675,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Add the header row
         const thead = authorTable.createTHead();
         const headerRow = thead.insertRow();
-        const headers = ['AUTHOR', 'FUNCTION', 'STATUS', 'EMPLOYED'];
+        const headers = ['EMP ID', 'NAME', 'PROJRCT NAME', 'DEPARTMENT', 'DATE', 'STATUS', 'PRODUCTION STATUS', 'ACTION'];
 
         headers.forEach((headerText) => {
           const th = document.createElement('th');
@@ -684,29 +687,62 @@ document.addEventListener('DOMContentLoaded', function () {
           headerRow.appendChild(th);
         });
 
-        // Populate the table with the fetched data (without duplicates)
+        // Populate the table with the fetched data and filter duplicate EmpId and Name
         const tbody = authorTable.createTBody();
 
-        // This set will store unique data based on the Author and Function fields
-        const uniqueData = new Set();
-
         data.forEach((item) => {
-          const key = `${item.Author}-${item.Function}`;
+          const key = `${item.EmpId}-${item.Name}`;
           if (!uniqueData.has(key)) {
             const newRow = tbody.insertRow(-1);
-            const authorCell = newRow.insertCell(0);
-            const functionCell = newRow.insertCell(1);
-            const statusCell = newRow.insertCell(2);
-            const employedCell = newRow.insertCell(3);
+            const empidCell = newRow.insertCell(0);
+            const nameCell = newRow.insertCell(1);
+            const projectnameCell = newRow.insertCell(2);
+            const departmentCell = newRow.insertCell(3);
+            const dateCell = newRow.insertCell(4);
+            const statusCell = newRow.insertCell(5);
+            const productionstatusCell = newRow.insertCell(6);
+            const actionCell = newRow.insertCell(7);
 
-            authorCell.innerHTML = item.Author;
-            functionCell.innerHTML = item.Function;
+            empidCell.innerHTML = item.EmpId;
+            nameCell.innerHTML = item.Name;
+            projectnameCell.innerHTML = item.ProjectName;
+            departmentCell.innerHTML = item.Department;
+            dateCell.innerHTML = item.Date;
             statusCell.innerHTML = item.Status;
-            employedCell.innerHTML = item.Employed;
+            productionstatusCell.innerHTML = item.ProductionStatus;
+            actionCell.innerHTML = '<button class="delete-button" data-id="' + item._id + '">Delete</button>';
 
             // Add the key to the set to mark it as seen
             uniqueData.add(key);
           }
+        });
+
+        // Add click event listener to delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach((button) => {
+          button.addEventListener('click', async (event) => {
+            const id = event.target.getAttribute('data-id');
+            if (id) {
+              // Call the delete API with the id to delete the record
+              try {
+                const deleteResponse = await fetch(`http://localhost:8080/api/delete/${id}`, {
+                  method: 'DELETE',
+                });
+
+                if (deleteResponse.status === 200) {
+                  alert('Data deleted successfully.');
+                  // Refresh the table after deleting
+                  fetchDataAndPopulateTable();
+                } else {
+                  const data = await deleteResponse.json();
+                  alert(data.error);
+                }
+              } catch (deleteError) {
+                console.error(deleteError);
+                alert('An error occurred during delete.');
+              }
+            }
+          });
         });
       } else {
         alert('Failed to fetch data from the server.');
@@ -730,6 +766,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const formData = new FormData();
     formData.append('excelFile', file);
+
+    // Before sending the data to the server, check for duplicates in the frontend
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const excelData = XLSX.utils.sheet_to_json(sheet);
+
+    for (const item of excelData) {
+      const key = `${item.EmpId}-${item.Name}`;
+      if (uniqueData.has(key)) {
+        alert(`Duplicate data detected for EmpId: ${item.EmpId} and Name: ${item.Name}.`);
+        return; // Prevent upload
+      }
+      uniqueData.add(key);
+    }
 
     try {
       const uploadResponse = await fetch('http://localhost:8080/api/upload', {
@@ -756,9 +807,9 @@ document.addEventListener('DOMContentLoaded', function () {
   fetchDataAndPopulateTable();
 });
 
+</script>
 
-  </script>
-  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
