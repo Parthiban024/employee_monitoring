@@ -268,10 +268,10 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="row bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                 <div class="col-md-6"><h6 class="text-white text-capitalize ps-3">Employees table</h6></div>
-                <div class="col-md-6 d-flex justify-content-end">
+                <div class="col-md-6 d-flex justify-content-end gap-3">
                     <label for="fileInput" class="upload_label">Add a file</label>
    <input type="file" id="fileInput" class="file_upload" accept=".xlsx">
-   <button id="uploadButton">Upload</button>
+   <button class="upload_label" id="uploadButton">Upload</button>
                    </div>
                 
               </div>
@@ -710,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dateCell.innerHTML = item.Date;
             statusCell.innerHTML = item.Status;
             productionstatusCell.innerHTML = item.ProductionStatus;
-            actionCell.innerHTML = '<button class="delete-button" data-id="' + item._id + '">Delete</button>';
+            actionCell.innerHTML = '<button class="delete-button upload_label" data-id="' + item._id + '">Delete</button>';
 
             // Add the key to the set to mark it as seen
             uniqueData.add(key);
